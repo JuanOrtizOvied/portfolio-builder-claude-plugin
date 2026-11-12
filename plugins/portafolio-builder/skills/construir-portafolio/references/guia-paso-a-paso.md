@@ -27,7 +27,8 @@ Si no sabe por dónde empezar, sugiérele **su cuenta más grande**.
    - una tabla mínima instrumento → subcategoría → USD, solo de lo nuevo;
    - las dudas (confianza baja) en forma de pregunta concreta.
 3. Actualiza el avance por sección (ver abajo) y genera el **dashboard de avance** con `scripts/generar_dashboard.py`, para que vea cómo va tomando forma.
-4. Cierra con **la siguiente pregunta de la lista de verificación**.
+4. Si este documento agregó productos a una sección que sigue sin confirmar, **pregunta primero si eso es todo lo que tiene en esa sección** ("¿Tienes algún otro fondo privado además de estos tres?"). Con un sí, márcala `completa`. El dashboard muestra esas secciones como "En progreso · falta confirmar".
+5. Cierra con **la siguiente pregunta de la lista de verificación**.
 
 ## Lista de verificación por sección
 

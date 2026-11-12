@@ -2,6 +2,14 @@
 
 Cada versión publicada aquí llega a todas las personas que instalaron el plugin.
 
+## 1.1.1 — 2026-11-12
+
+**Correcciones**
+- El avance por sección ahora distingue tres estados: **Sin información aún**, **En progreso · falta confirmar** (ya hay productos cargados, pero la persona no confirmó que sea todo) y **Completa / No aplica**. Antes, una sección con datos aparecía como "Pendiente".
+- Cada tarjeta del avance muestra el monto y la cantidad de productos cargados.
+- En Mercados Privados, el título "Deuda Privada" ya no aparece encima de Private Equity, Venture Capital y las demás subcategorías.
+- Claude pregunta si ya está todo apenas agrega productos a una sección.
+
 ## 1.1.0 — 2026-11-12
 
 **Nuevo**

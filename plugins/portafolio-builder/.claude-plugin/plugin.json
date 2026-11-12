@@ -1,6 +1,6 @@
 {
   "name": "portafolio-builder",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Te guía paso a paso para armar tu portafolio de inversión desde estados de cuenta, PDFs y factsheets, lo clasifica en las categorías de Sabbi y lo muestra en un dashboard con el Excel descargable.",
   "author": {
     "name": "Sabbi"

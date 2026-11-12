@@ -25,11 +25,23 @@ from llenar_plantilla import FUERA, cargar_categorias, validar  # noqa: E402
 ASSETS = os.path.join(AQUI, "..", "assets")
 PLUGIN_JSON = os.path.join(AQUI, "..", "..", "..", ".claude-plugin", "plugin.json")
 
+# Estado que se muestra por sección:
+#  - completa / no_aplica: la persona lo confirmó.
+#  - en_progreso: ya hay productos cargados, pero falta que confirme que es todo.
+#  - sin_datos: aún no hay nada ni confirmación.
 ESTADOS = {
     "completa": ("Completa", "✓"),
     "no_aplica": ("No aplica", "–"),
-    "pendiente": ("Pendiente", "…"),
+    "en_progreso": ("En progreso · falta confirmar", "◐"),
+    "sin_datos": ("Sin información aún", "○"),
 }
+
+
+def estado_seccion(n, sec_estado, datos):
+    confirmado = (sec_estado.get(n) or {}).get("estado")
+    if confirmado in ("completa", "no_aplica"):
+        return confirmado
+    return "en_progreso" if datos["n_por_seccion"].get(n) else "sin_datos"
 
 
 def e(x):
@@ -61,6 +73,10 @@ def calcular(entrada, cats, tc):
         por_cat[p["categoria"]] += v
         filas.append({**p, "moneda": mon, "usd": v})
     total = sum(v for k, v in por_cat.items() if k not in FUERA)
+    n_por_seccion = defaultdict(int)
+    for f in filas:
+        if f["categoria"] not in FUERA:
+            n_por_seccion[cats[f["categoria"]]["grupo"].split(".")[0]] += 1
     emp = por_cat.get("EMPRESA_PRIVADA", 0.0)
 
     secciones = {}
@@ -76,7 +92,7 @@ def calcular(entrada, cats, tc):
 
     peru = sum(por_cat.get(k, 0) for k, c in cats.items() if k not in FUERA and c.get("region") == "Perú")
     return {"total": total, "emp": emp, "secciones": secciones, "filas": filas,
-            "peru": peru, "ext": total - peru, "por_cat": por_cat}
+            "peru": peru, "ext": total - peru, "por_cat": por_cat, "n_por_seccion": n_por_seccion}
 
 
 def donut(secciones, total, tema):
@@ -107,22 +123,30 @@ def html_dashboard(entrada, datos, tema, excel_b64, excel_nombre):
     total = datos["total"]
     sec_estado = entrada.get("secciones") or {}
     nums = sorted(datos["secciones"])
-    completas = sum(1 for n in nums if (sec_estado.get(n) or {}).get("estado") in ("completa", "no_aplica"))
-    pendientes = [datos["secciones"][n]["nombre"] for n in nums
-                  if (sec_estado.get(n) or {}).get("estado", "pendiente") == "pendiente"]
+    estados = {n: estado_seccion(n, sec_estado, datos) for n in nums}
+    completas = sum(1 for n in nums if estados[n] in ("completa", "no_aplica"))
+    en_progreso = [datos["secciones"][n]["nombre"] for n in nums if estados[n] == "en_progreso"]
+    sin_datos = [datos["secciones"][n]["nombre"] for n in nums if estados[n] == "sin_datos"]
     revisar = [f for f in datos["filas"] if (f.get("confianza") or "media").lower() == "baja"]
 
     # Avance
     chips = []
     for n in nums:
-        est = (sec_estado.get(n) or {}).get("estado", "pendiente")
-        etq, ico = ESTADOS.get(est, ESTADOS["pendiente"])
+        est = estados[n]
+        etq, ico = ESTADOS[est]
+        cant = datos["n_por_seccion"].get(n, 0)
+        extra = (f'<span class="chip-x">{usd(datos["secciones"][n]["usd"])} · {cant} producto{"s" if cant != 1 else ""}</span>'
+                 if cant else "")
         chips.append(f'<div class="chip chip-{est}"><span class="dot" style="background:{tema["colores_secciones"].get(n)}"></span>'
-                     f'<span class="chip-n">{e(datos["secciones"][n]["nombre"])}</span>'
+                     f'<span class="chip-n">{e(datos["secciones"][n]["nombre"])}</span>{extra}'
                      f'<span class="chip-e">{ico} {etq}</span></div>')
-    if pendientes:
-        banner = (f'<div class="banner">Portafolio en construcción: {completas} de {len(nums)} secciones revisadas. '
-                  f'Falta revisar: <b>{e(", ".join(pendientes))}</b>.</div>')
+    if en_progreso or sin_datos:
+        partes = [f'Portafolio en construcción: <b>{completas} de {len(nums)}</b> secciones confirmadas.']
+        if en_progreso:
+            partes.append(f'Con productos, falta confirmar que esté todo: <b>{e(", ".join(en_progreso))}</b>.')
+        if sin_datos:
+            partes.append(f'Sin información aún: <b>{e(", ".join(sin_datos))}</b>.')
+        banner = f'<div class="banner">{" ".join(partes)}</div>'
     else:
         banner = '<div class="banner ok">Portafolio completo: todas las secciones fueron revisadas.</div>'
 
@@ -153,8 +177,11 @@ def html_dashboard(entrada, datos, tema, excel_b64, excel_nombre):
         color = tema["colores_secciones"].get(n)
         frac_s = s["usd"] / total if total else 0
         cuerpo = []
+        # Títulos de subgrupo solo si la sección realmente agrupa varias
+        # subcategorías bajo un mismo título (p. ej. Real Estate Perú).
+        agrupa = any(len(items) > 1 for items in s["subgrupos"].values())
         for sub, items in s["subgrupos"].items():
-            mostrar_sub = not (len(items) == 1 and items[0]["nombre"] == sub)
+            mostrar_sub = agrupa and not (len(items) == 1 and items[0]["nombre"] == sub)
             if mostrar_sub:
                 cuerpo.append(f'<div class="sub">{e(sub)}</div>')
             for it in items:
@@ -166,8 +193,8 @@ def html_dashboard(entrada, datos, tema, excel_b64, excel_nombre):
                     f'<div class="barra"><div style="width:{ancho:.1f}%;background:{color}"></div></div>'
                     f'<div class="fila-p">{pct(f_) if it["usd"] else "—"}</div>'
                     f'<div class="fila-u">{usd(it["usd"]) if it["usd"] else ""}</div></div>')
-        est = (sec_estado.get(n) or {}).get("estado", "pendiente")
-        etq, ico = ESTADOS.get(est, ESTADOS["pendiente"])
+        est = estados[n]
+        etq, ico = ESTADOS[est]
         tarjetas.append(
             f'<section class="card sec" style="border-top-color:{color}"><header>'
             f'<div><div class="sec-num" style="color:{color}">{e(n)}</div><h3>{e(s["nombre"])}</h3></div>'
@@ -226,7 +253,9 @@ def html_dashboard(entrada, datos, tema, excel_b64, excel_nombre):
 .chips{{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}}
 .chip{{border:1px solid var(--b);border-radius:10px;padding:10px;background:var(--card);display:flex;flex-direction:column;gap:4px}}
 .chip-n{{font-weight:600;font-size:13px}}.chip-e{{font-size:12px;color:var(--ts)}}
-.chip-completa .chip-e{{color:#2D7A3A}}.chip-pendiente{{border-style:dashed}}
+.chip-x{{font-size:12px;color:var(--t);font-variant-numeric:tabular-nums}}
+.chip-completa .chip-e{{color:#2D7A3A}}.chip-en_progreso{{border-color:#E8C27A;background:#FFFBF2}}.chip-en_progreso .chip-e{{color:#9A6A12}}
+.chip-sin_datos{{border-style:dashed}}
 .dot{{display:inline-block;width:10px;height:10px;border-radius:50%;flex:none}}
 .kpis{{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}}
 .kpi{{background:var(--card);border:1px solid var(--b);border-radius:12px;padding:16px 18px}}
@@ -242,7 +271,7 @@ h2{{font-size:16px;margin:0 0 12px}}
 .sec header{{display:flex;justify-content:space-between;gap:12px;margin-bottom:10px}}
 .sec h3{{margin:0;font-size:17px}}.sec-num{{font-weight:800;font-size:12px}}
 .sec-tot{{text-align:right}}.sec-p{{font-size:20px;font-weight:700;font-variant-numeric:tabular-nums}}.sec-u{{color:var(--ts);font-size:12px}}
-.sec-e{{font-size:11px;margin-top:2px;color:var(--ts)}}.est-completa{{color:#2D7A3A}}
+.sec-e{{font-size:11px;margin-top:2px;color:var(--ts)}}.est-completa{{color:#2D7A3A}}.est-en_progreso{{color:#9A6A12}}
 .sub{{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--ts);margin:10px 0 2px;font-weight:600}}
 .fila{{display:grid;grid-template-columns:1.6fr 1fr 56px 100px;gap:10px;align-items:center;padding:5px 0}}
 .fila-n{{font-size:13px}}.fila-p{{text-align:right;font-weight:600;font-variant-numeric:tabular-nums}}

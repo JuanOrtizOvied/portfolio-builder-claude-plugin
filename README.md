@@ -16,13 +16,13 @@ Necesitas un plan de pago de Claude (Pro, Max, Team o Enterprise).
 
 1. Abre **Customize** en la barra lateral izquierda y entra a la pestaña **Plugins**.
 2. En **Personal plugins**, haz clic en **+** → **Add marketplace** → **Add from a repository**.
-3. Pega: `JuanOrtizOvied/portfolio-builder-claude-plugin` (lo reemplaza el administrador; ver abajo) y haz clic en **Sync**.
+3. Pega: `USUARIO-GITHUB/NOMBRE-REPO` (lo reemplaza el administrador; ver abajo) y haz clic en **Sync**.
 4. En **Browse plugins** → pestaña **Personal**, instala **portafolio-builder**.
 
 ### En Claude Code
 
 ```
-/plugin marketplace add JuanOrtizOvied/portfolio-builder-claude-plugin
+/plugin marketplace add USUARIO-GITHUB/NOMBRE-REPO
 /plugin install portafolio-builder@sabbi-plugins
 ```
 
