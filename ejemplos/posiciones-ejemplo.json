@@ -1,0 +1,198 @@
+{
+  "cliente": "Cliente de Ejemplo (datos ficticios)",
+  "fecha_corte": "2026-10-31",
+  "tipos_cambio": {
+    "PEN": 3.75
+  },
+  "fuente_tipos_cambio": "Ejemplo: tipo de cambio supuesto para pruebas",
+  "secciones": {
+    "1": {
+      "estado": "completa"
+    },
+    "2": {
+      "estado": "completa"
+    },
+    "3": {
+      "estado": "no_aplica"
+    },
+    "4": {
+      "estado": "completa"
+    },
+    "5": {
+      "estado": "completa"
+    },
+    "6": {
+      "estado": "completa"
+    }
+  },
+  "posiciones": [
+    {
+      "institucion": "Interactive Brokers",
+      "cuenta": "U0000001",
+      "instrumento": "Vanguard S&P 500 ETF",
+      "ticker_isin": "VOO",
+      "categoria": "RV_US_LARGE_CAP",
+      "monto": 250000,
+      "moneda": "USD",
+      "fuente": "ejemplo_ibkr.pdf p.2",
+      "confianza": "alta",
+      "nota": "ETF S&P 500"
+    },
+    {
+      "institucion": "Interactive Brokers",
+      "cuenta": "U0000001",
+      "instrumento": "iShares Russell 2000 ETF",
+      "ticker_isin": "IWM",
+      "categoria": "RV_US_MID_SMALL",
+      "monto": 40000,
+      "moneda": "USD",
+      "fuente": "ejemplo_ibkr.pdf p.2",
+      "confianza": "alta",
+      "nota": "Small cap EE. UU."
+    },
+    {
+      "institucion": "Interactive Brokers",
+      "cuenta": "U0000001",
+      "instrumento": "iShares MSCI ACWI (porción US Large Cap)",
+      "ticker_isin": "ACWI",
+      "categoria": "RV_US_LARGE_CAP",
+      "monto": 38000,
+      "moneda": "USD",
+      "fuente": "ejemplo_ibkr.pdf p.2",
+      "confianza": "media",
+      "nota": "Split según factsheet: 63% EE. UU."
+    },
+    {
+      "institucion": "Interactive Brokers",
+      "cuenta": "U0000001",
+      "instrumento": "iShares MSCI ACWI (porción Desarrollados)",
+      "ticker_isin": "ACWI",
+      "categoria": "RV_DESARROLLADOS",
+      "monto": 15000,
+      "moneda": "USD",
+      "fuente": "ejemplo_ibkr.pdf p.2",
+      "confianza": "media",
+      "nota": "Split según factsheet: 25%"
+    },
+    {
+      "institucion": "Interactive Brokers",
+      "cuenta": "U0000001",
+      "instrumento": "iShares MSCI ACWI (porción Emergentes)",
+      "ticker_isin": "ACWI",
+      "categoria": "RV_EMERGENTES",
+      "monto": 7000,
+      "moneda": "USD",
+      "fuente": "ejemplo_ibkr.pdf p.2",
+      "confianza": "media",
+      "nota": "Split según factsheet: 12%"
+    },
+    {
+      "institucion": "Interactive Brokers",
+      "cuenta": "U0000001",
+      "instrumento": "iShares 7-10 Year Treasury Bond ETF",
+      "ticker_isin": "IEF",
+      "categoria": "RF_US_TREASURIES",
+      "monto": 80000,
+      "moneda": "USD",
+      "fuente": "ejemplo_ibkr.pdf p.3",
+      "confianza": "alta",
+      "nota": ""
+    },
+    {
+      "institucion": "Interactive Brokers",
+      "cuenta": "U0000001",
+      "instrumento": "Bono Global Perú 2033",
+      "ticker_isin": "US715638DF60",
+      "categoria": "RF_PERU",
+      "monto": 50000,
+      "moneda": "USD",
+      "fuente": "ejemplo_ibkr.pdf p.3",
+      "confianza": "alta",
+      "nota": "Soberano peruano"
+    },
+    {
+      "institucion": "Credicorp Capital",
+      "cuenta": "000123",
+      "instrumento": "Credicorp Ltd",
+      "ticker_isin": "BAP",
+      "categoria": "RV_PERU",
+      "monto": 112500,
+      "moneda": "PEN",
+      "fuente": "ejemplo_ccc.pdf p.1",
+      "confianza": "alta",
+      "nota": ""
+    },
+    {
+      "institucion": "Fondo XYZ",
+      "cuenta": "LP-77",
+      "instrumento": "XYZ Private Credit Fund II",
+      "ticker_isin": "",
+      "categoria": "PM_PRIVATE_DEBT",
+      "monto": 60000,
+      "moneda": "USD",
+      "fuente": "ejemplo_capital_statement.pdf",
+      "confianza": "alta",
+      "nota": "NAV a 30/09"
+    },
+    {
+      "institucion": "Coinbase",
+      "cuenta": "",
+      "instrumento": "Bitcoin",
+      "ticker_isin": "BTC",
+      "categoria": "CRIPTO_BITCOIN",
+      "monto": 20000,
+      "moneda": "USD",
+      "fuente": "captura_coinbase.png",
+      "confianza": "alta",
+      "nota": ""
+    },
+    {
+      "institucion": "BCP",
+      "cuenta": "Ahorros",
+      "instrumento": "Depósito a plazo 180 días",
+      "ticker_isin": "",
+      "categoria": "CASH",
+      "monto": 75000,
+      "moneda": "PEN",
+      "fuente": "ejemplo_bcp.pdf",
+      "confianza": "alta",
+      "nota": ""
+    },
+    {
+      "institucion": "Propio",
+      "cuenta": "",
+      "instrumento": "Departamento Miraflores (alquilado)",
+      "ticker_isin": "",
+      "categoria": "RE_PE_RESIDENCIAL",
+      "monto": 180000,
+      "moneda": "USD",
+      "fuente": "Declarado por el cliente",
+      "confianza": "media",
+      "nota": "Valor estimado por el cliente"
+    },
+    {
+      "institucion": "Propio",
+      "cuenta": "",
+      "instrumento": "Empresa familiar SAC (40%)",
+      "ticker_isin": "",
+      "categoria": "EMPRESA_PRIVADA",
+      "monto": 300000,
+      "moneda": "USD",
+      "fuente": "Declarado por el cliente",
+      "confianza": "baja",
+      "nota": "Valor aproximado, sin tasación"
+    },
+    {
+      "institucion": "Interactive Brokers",
+      "cuenta": "U0000001",
+      "instrumento": "Préstamo de margen",
+      "ticker_isin": "",
+      "categoria": "EXCLUIR",
+      "monto": -5000,
+      "moneda": "USD",
+      "fuente": "ejemplo_ibkr.pdf p.1",
+      "confianza": "alta",
+      "nota": "Deuda, no suma"
+    }
+  ]
+}

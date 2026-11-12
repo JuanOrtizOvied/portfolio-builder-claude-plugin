@@ -1,0 +1,126 @@
+{
+  "cliente": "Cliente de Ejemplo (datos ficticios)",
+  "fecha_corte": "2026-10-31",
+  "tipos_cambio": {
+    "PEN": 3.75
+  },
+  "fuente_tipos_cambio": "Ejemplo: tipo de cambio supuesto para pruebas",
+  "secciones": {
+    "1": {
+      "estado": "pendiente"
+    },
+    "2": {
+      "estado": "pendiente"
+    },
+    "3": {
+      "estado": "pendiente"
+    },
+    "4": {
+      "estado": "completa"
+    },
+    "5": {
+      "estado": "pendiente"
+    },
+    "6": {
+      "estado": "pendiente"
+    }
+  },
+  "posiciones": [
+    {
+      "institucion": "Interactive Brokers",
+      "cuenta": "U0000001",
+      "instrumento": "Vanguard S&P 500 ETF",
+      "ticker_isin": "VOO",
+      "categoria": "RV_US_LARGE_CAP",
+      "monto": 250000,
+      "moneda": "USD",
+      "fuente": "ejemplo_ibkr.pdf p.2",
+      "confianza": "alta",
+      "nota": "ETF S&P 500"
+    },
+    {
+      "institucion": "Interactive Brokers",
+      "cuenta": "U0000001",
+      "instrumento": "iShares Russell 2000 ETF",
+      "ticker_isin": "IWM",
+      "categoria": "RV_US_MID_SMALL",
+      "monto": 40000,
+      "moneda": "USD",
+      "fuente": "ejemplo_ibkr.pdf p.2",
+      "confianza": "alta",
+      "nota": "Small cap EE. UU."
+    },
+    {
+      "institucion": "Interactive Brokers",
+      "cuenta": "U0000001",
+      "instrumento": "iShares MSCI ACWI (porción US Large Cap)",
+      "ticker_isin": "ACWI",
+      "categoria": "RV_US_LARGE_CAP",
+      "monto": 38000,
+      "moneda": "USD",
+      "fuente": "ejemplo_ibkr.pdf p.2",
+      "confianza": "media",
+      "nota": "Split según factsheet: 63% EE. UU."
+    },
+    {
+      "institucion": "Interactive Brokers",
+      "cuenta": "U0000001",
+      "instrumento": "iShares MSCI ACWI (porción Desarrollados)",
+      "ticker_isin": "ACWI",
+      "categoria": "RV_DESARROLLADOS",
+      "monto": 15000,
+      "moneda": "USD",
+      "fuente": "ejemplo_ibkr.pdf p.2",
+      "confianza": "media",
+      "nota": "Split según factsheet: 25%"
+    },
+    {
+      "institucion": "Interactive Brokers",
+      "cuenta": "U0000001",
+      "instrumento": "iShares MSCI ACWI (porción Emergentes)",
+      "ticker_isin": "ACWI",
+      "categoria": "RV_EMERGENTES",
+      "monto": 7000,
+      "moneda": "USD",
+      "fuente": "ejemplo_ibkr.pdf p.2",
+      "confianza": "media",
+      "nota": "Split según factsheet: 12%"
+    },
+    {
+      "institucion": "Interactive Brokers",
+      "cuenta": "U0000001",
+      "instrumento": "iShares 7-10 Year Treasury Bond ETF",
+      "ticker_isin": "IEF",
+      "categoria": "RF_US_TREASURIES",
+      "monto": 80000,
+      "moneda": "USD",
+      "fuente": "ejemplo_ibkr.pdf p.3",
+      "confianza": "alta",
+      "nota": ""
+    },
+    {
+      "institucion": "Interactive Brokers",
+      "cuenta": "U0000001",
+      "instrumento": "Bono Global Perú 2033",
+      "ticker_isin": "US715638DF60",
+      "categoria": "RF_PERU",
+      "monto": 50000,
+      "moneda": "USD",
+      "fuente": "ejemplo_ibkr.pdf p.3",
+      "confianza": "alta",
+      "nota": "Soberano peruano"
+    },
+    {
+      "institucion": "Interactive Brokers",
+      "cuenta": "U0000001",
+      "instrumento": "Préstamo de margen",
+      "ticker_isin": "",
+      "categoria": "EXCLUIR",
+      "monto": -5000,
+      "moneda": "USD",
+      "fuente": "ejemplo_ibkr.pdf p.1",
+      "confianza": "alta",
+      "nota": "Deuda, no suma"
+    }
+  ]
+}

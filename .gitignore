@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+.DS_Store
+# Nunca subir datos de clientes
+*.pdf
+*.png
+*.jpg
+prueba*.xlsx
+Portafolio_*.xlsx
+*.html
+!ejemplos/*.html

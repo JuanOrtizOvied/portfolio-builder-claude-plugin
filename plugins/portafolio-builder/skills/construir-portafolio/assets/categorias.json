@@ -1,0 +1,49 @@
+{
+  "_nota": "Fuente única de verdad de las categorías de la plantilla. 'celda' es la celda de la columna ACTUAL (D) de la hoja 'Sheet1' que recibe el % de esa categoría. 'region' indica cómo la cuenta la plantilla en la División Geográfica (fila 102 Perú / fila 103 Extranjero).",
+  "categorias": [
+    {"codigo": "RE_PE_RESIDENCIAL",   "grupo": "1. Inversiones Directas", "subgrupo": "Real Estate Perú",       "nombre": "Residencial",                                   "celda": "D17", "region": "Perú"},
+    {"codigo": "RE_PE_OFICINAS",      "grupo": "1. Inversiones Directas", "subgrupo": "Real Estate Perú",       "nombre": "Oficinas",                                      "celda": "D18", "region": "Perú"},
+    {"codigo": "RE_PE_COMERCIAL",     "grupo": "1. Inversiones Directas", "subgrupo": "Real Estate Perú",       "nombre": "Comercial / Industrial",                        "celda": "D19", "region": "Perú"},
+    {"codigo": "RE_EXTRANJERO",       "grupo": "1. Inversiones Directas", "subgrupo": "Real Estate Extranjero", "nombre": "Propiedades en el Extranjero en general",       "celda": "D21", "region": "Extranjero"},
+
+    {"codigo": "PM_PRIVATE_DEBT",     "grupo": "2. Mercados Privados", "subgrupo": "Deuda Privada",   "nombre": "Private Debt",   "celda": "D28", "region": "Extranjero"},
+    {"codigo": "PM_PRIVATE_EQUITY",   "grupo": "2. Mercados Privados", "subgrupo": "Private Equity",  "nombre": "Private Equity", "celda": "D30", "region": "Extranjero"},
+    {"codigo": "PM_VENTURE_CAPITAL",  "grupo": "2. Mercados Privados", "subgrupo": "Venture Capital", "nombre": "Venture Capital","celda": "D32", "region": "Extranjero"},
+    {"codigo": "PM_REAL_ESTATE",      "grupo": "2. Mercados Privados", "subgrupo": "Real Estate",     "nombre": "Real Estate",    "celda": "D34", "region": "Extranjero"},
+    {"codigo": "PM_HEDGE_FUNDS",      "grupo": "2. Mercados Privados", "subgrupo": "Hedge Funds",     "nombre": "Hedge Funds",    "celda": "D36", "region": "Extranjero"},
+    {"codigo": "PM_INFRAESTRUCTURA",  "grupo": "2. Mercados Privados", "subgrupo": "Infrastructure",  "nombre": "Infrastructure", "celda": "D38", "region": "Extranjero"},
+
+    {"codigo": "CD_RE_PERU",          "grupo": "3. Club Deals", "subgrupo": "Real Estate",   "nombre": "Perú",       "celda": "D45", "region": "Perú"},
+    {"codigo": "CD_RE_EXTRANJERO",    "grupo": "3. Club Deals", "subgrupo": "Real Estate",   "nombre": "Extranjero", "celda": "D46", "region": "Extranjero"},
+    {"codigo": "CD_DEUDA_PERU",       "grupo": "3. Club Deals", "subgrupo": "Deuda Privada", "nombre": "Perú",       "celda": "D48", "region": "Perú"},
+    {"codigo": "CD_DEUDA_EXTRANJERO", "grupo": "3. Club Deals", "subgrupo": "Deuda Privada", "nombre": "Extranjero", "celda": "D49", "region": "Extranjero"},
+    {"codigo": "CD_OTROS_PERU",       "grupo": "3. Club Deals", "subgrupo": "Otros",         "nombre": "Perú",       "celda": "D51", "region": "Perú"},
+    {"codigo": "CD_OTROS_EXTRANJERO", "grupo": "3. Club Deals", "subgrupo": "Otros",         "nombre": "Extranjero", "celda": "D52", "region": "Extranjero"},
+
+    {"codigo": "RV_US_LARGE_CAP",     "grupo": "4. Mercados Públicos", "subgrupo": "Renta Variable", "nombre": "US Large Cap",                       "celda": "D59", "region": "Extranjero"},
+    {"codigo": "RV_US_MID_SMALL",     "grupo": "4. Mercados Públicos", "subgrupo": "Renta Variable", "nombre": "US Mid and Small Cap",               "celda": "D60", "region": "Extranjero"},
+    {"codigo": "RV_DESARROLLADOS",    "grupo": "4. Mercados Públicos", "subgrupo": "Renta Variable", "nombre": "Mercados Desarrollados (ex US)",     "celda": "D61", "region": "Extranjero"},
+    {"codigo": "RV_EMERGENTES",       "grupo": "4. Mercados Públicos", "subgrupo": "Renta Variable", "nombre": "Mercados Emergentes (ex Perú)",      "celda": "D62", "region": "Extranjero"},
+    {"codigo": "RV_PERU",             "grupo": "4. Mercados Públicos", "subgrupo": "Renta Variable", "nombre": "Perú",                               "celda": "D63", "region": "Perú"},
+    {"codigo": "RF_US_TREASURIES",    "grupo": "4. Mercados Públicos", "subgrupo": "Renta Fija",     "nombre": "US Treasuries (Bonos del Tesoro de US)", "celda": "D65", "region": "Extranjero"},
+    {"codigo": "RF_INVESTMENT_GRADE", "grupo": "4. Mercados Públicos", "subgrupo": "Renta Fija",     "nombre": "Bonos Corporativos Investment Grade (AAA-BBB)", "celda": "D66", "region": "Extranjero"},
+    {"codigo": "RF_HIGH_YIELD",       "grupo": "4. Mercados Públicos", "subgrupo": "Renta Fija",     "nombre": "Bonos High Yield (BB o menor)",      "celda": "D67", "region": "Extranjero"},
+    {"codigo": "RF_EMERGENTES",       "grupo": "4. Mercados Públicos", "subgrupo": "Renta Fija",     "nombre": "Bonos de Mercados Emergentes",       "celda": "D68", "region": "Extranjero"},
+    {"codigo": "RF_LATAM",            "grupo": "4. Mercados Públicos", "subgrupo": "Renta Fija",     "nombre": "Bonos Latinoamérica",                "celda": "D69", "region": "Extranjero"},
+    {"codigo": "RF_PERU",             "grupo": "4. Mercados Públicos", "subgrupo": "Renta Fija",     "nombre": "Bonos Perú",                         "celda": "D70", "region": "Perú"},
+
+    {"codigo": "CRIPTO_BITCOIN",      "grupo": "5. Otros", "subgrupo": "Cripto",      "nombre": "Bitcoin",             "celda": "D77", "region": "Extranjero"},
+    {"codigo": "CRIPTO_ETHEREUM",     "grupo": "5. Otros", "subgrupo": "Cripto",      "nombre": "Ethereum",            "celda": "D78", "region": "Extranjero"},
+    {"codigo": "CRIPTO_OTRAS",        "grupo": "5. Otros", "subgrupo": "Cripto",      "nombre": "Otras Criptomonedas", "celda": "D79", "region": "Extranjero"},
+    {"codigo": "COMMODITY_ORO",       "grupo": "5. Otros", "subgrupo": "Commodities", "nombre": "Oro",                 "celda": "D81", "region": "Extranjero"},
+    {"codigo": "COMMODITY_OTROS",     "grupo": "5. Otros", "subgrupo": "Commodities", "nombre": "Otros Commodities",   "celda": "D82", "region": "Extranjero"},
+
+    {"codigo": "CASH",                "grupo": "6. Cash y Equivalentes", "subgrupo": "Cash", "nombre": "Depósitos a Plazo, Fondos de Money Market", "celda": "D89", "region": "Perú"}
+  ],
+  "fuera_del_portafolio": [
+    {"codigo": "EMPRESA_PRIVADA", "nombre": "Acciones en Empresas Privadas (negocios propios o familiares)", "celda": "D8",
+     "nota": "No forma parte del Portafolio de Inversión. D8 = Empresas / (Empresas + Portafolio). La plantilla calcula D9 = 1 - D8."},
+    {"codigo": "EXCLUIR", "nombre": "No se incluye (deudas, saldos negativos, duplicados, activos de uso personal)", "celda": null,
+     "nota": "Se lista en el detalle para trazabilidad pero no suma en ningún total."}
+  ]
+}

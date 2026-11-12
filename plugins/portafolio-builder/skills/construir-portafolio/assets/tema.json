@@ -1,0 +1,25 @@
+{
+  "_nota": "Identidad visual del dashboard. Cambia un color aquí, sube la versión del plugin y haz push: todos los usuarios verán el cambio en su próximo dashboard.",
+  "marca": "Sabbi",
+  "titulo": "Tu portafolio de inversión",
+  "fuente": "'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif",
+  "colores": {
+    "primario": "#14213D",
+    "acento": "#C9A227",
+    "fondo": "#F6F5F1",
+    "tarjeta": "#FFFFFF",
+    "texto": "#1B1B1B",
+    "texto_suave": "#6B6B6B",
+    "borde": "#E4E1D8",
+    "alerta": "#D9822B",
+    "vacio": "#ECEAE3"
+  },
+  "colores_secciones": {
+    "1": "#8C5E3C",
+    "2": "#3A5A8C",
+    "3": "#6A8D73",
+    "4": "#14213D",
+    "5": "#C9A227",
+    "6": "#9A9A9A"
+  }
+}
