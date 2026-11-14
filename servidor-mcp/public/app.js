@@ -231,9 +231,9 @@
     var wb = new ExcelJS.Workbook();
     await wb.xlsx.load(buf);
     var ws = wb.getWorksheet("Sheet1");
-    var A = "Arial", HEAD = { type: "pattern", pattern: "solid", fgColor: { argb: "FF1F3864" } };
-    var BAJA = { type: "pattern", pattern: "solid", fgColor: { argb: "FFFCE4D6" } };
-    var TOT = { type: "pattern", pattern: "solid", fgColor: { argb: "FFD9E1F2" } };
+    var A = "Arial", HEAD = { type: "pattern", pattern: "solid", fgColor: { argb: "FF223A13" } };
+    var BAJA = { type: "pattern", pattern: "solid", fgColor: { argb: "FFFFF7CD" } };
+    var TOT = { type: "pattern", pattern: "solid", fgColor: { argb: "FFE0ECD3" } };
 
     var monedas = ["USD"].concat(Object.keys(d.tc).filter(function (m) { return m !== "USD"; }).sort());
     var rangoTC = "'Tipos de Cambio'!$A$5:$B$" + (4 + monedas.length);

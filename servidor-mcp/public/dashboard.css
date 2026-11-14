@@ -1,4 +1,4 @@
-:root{--p:#14213D;--a:#C9A227;--bg:#F6F5F1;--card:#fff;--t:#1B1B1B;--ts:#6B6B6B;--b:#E4E1D8;--al:#D9822B;--v:#ECEAE3;--f:system-ui,sans-serif}
+:root{--p:#223A13;--a:#C3ED74;--bg:#F4F4ED;--card:#fff;--t:#162200;--ts:#6B715F;--b:#D0DDC4;--al:#FFBC05;--v:#E0ECD3;--f:'Pratico','Inter',system-ui,sans-serif}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--t);font-family:var(--f);font-size:14px;line-height:1.45}
 .top{background:var(--p);color:#fff;padding:28px 32px 64px}
 .top-in,.wrap{max-width:1160px;margin:0 auto}
