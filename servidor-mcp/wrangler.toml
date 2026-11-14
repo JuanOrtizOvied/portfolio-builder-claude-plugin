@@ -12,3 +12,8 @@ binding = "ASSETS"
 type = "Text"
 globs = ["**/*.md"]
 fallthrough = true
+
+[[rules]]
+type = "Text"
+globs = ["**/*.css"]
+fallthrough = true

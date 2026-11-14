@@ -3,6 +3,7 @@ import instrucciones from "../contenido/instrucciones.md";
 import guia from "../contenido/guia-paso-a-paso.md";
 import reglas from "../contenido/reglas-clasificacion.md";
 import meta from "../package.json";
+import { MIME_APP, VISTA_URI, htmlVista } from "./vista";
 import { CATEGORIAS, CODIGOS, Estado, FUERA, codificar, decodificar, etiqueta, resumir, validar } from "./portafolio";
 
 const VERSIONES_PROTOCOLO = ["2025-11-25", "2025-06-18", "2025-03-26", "2024-11-05"];
@@ -73,9 +74,10 @@ const HERRAMIENTAS = [
     name: "actualizar_dashboard",
     title: "Actualizar dashboard",
     description:
-      "Valida el portafolio, calcula los porcentajes por sección y subcategoría y devuelve el enlace del dashboard (con botón para descargar el Excel). Envía siempre el estado COMPLETO. Los datos no se guardan en el servidor: viajan dentro del enlace.",
+      "Valida el portafolio, calcula los porcentajes por sección y subcategoría y muestra el dashboard en Claude (en el panel lateral cuando está disponible), con botón para descargar el Excel. También devuelve un enlace para abrirlo en el navegador. Envía siempre el estado COMPLETO. Los datos no se guardan en el servidor.",
     inputSchema: { type: "object", properties: { estado: esquemaEstado }, required: ["estado"] },
     annotations: { readOnlyHint: true },
+    _meta: { ui: { resourceUri: VISTA_URI }, "ui/resourceUri": VISTA_URI },
   },
   {
     name: "leer_enlace",
@@ -113,7 +115,11 @@ async function llamarHerramienta(nombre: string, args: any, origen: string) {
       if (errores.length) return texto(`No se generó el dashboard. Corrige y vuelve a llamar:\n- ${errores.join("\n- ")}`, true);
       const enlace = `${origen}/d#${await codificar(estado)}`;
       const resumen = resumir(estado, tc);
-      return texto(JSON.stringify({ version: VERSION, enlace_dashboard: enlace, resumen }, null, 2));
+      return {
+        ...texto(JSON.stringify({ version: VERSION, enlace_dashboard: enlace, resumen,
+          nota: "El dashboard ya se muestra en el chat o en el panel lateral. Da también el enlace para guardarlo." }, null, 2)),
+        structuredContent: { version: VERSION, enlace_dashboard: enlace, resumen, estado },
+      };
     }
 
     case "leer_enlace": {
@@ -141,7 +147,7 @@ async function atender(msg: any, origen: string): Promise<any | null> {
       const pedida = params?.protocolVersion;
       return ok({
         protocolVersion: VERSIONES_PROTOCOLO.includes(pedida) ? pedida : VERSIONES_PROTOCOLO[0],
-        capabilities: { tools: { listChanged: false } },
+        capabilities: { tools: { listChanged: false }, resources: { listChanged: false } },
         serverInfo: { name: "sabbi-portafolio", title: "Sabbi · Portafolio", version: VERSION },
         instructions:
           "Conector de Sabbi para armar portafolios de inversión. Ante cualquier pedido sobre armar, clasificar o continuar un portafolio, llama primero a obtener_instrucciones.",
@@ -156,7 +162,27 @@ async function atender(msg: any, origen: string): Promise<any | null> {
       return r ? ok(r) : err(-32602, `Herramienta desconocida: ${params?.name}`);
     }
     case "resources/list":
-      return ok({ resources: [] });
+      return ok({ resources: [{ uri: VISTA_URI, name: "Dashboard del portafolio", mimeType: MIME_APP }] });
+    case "resources/templates/list":
+      return ok({ resourceTemplates: [] });
+    case "resources/read": {
+      if (params?.uri !== VISTA_URI) return err(-32002, `Recurso no encontrado: ${params?.uri}`);
+      return ok({
+        contents: [{
+          uri: VISTA_URI,
+          mimeType: MIME_APP,
+          text: htmlVista(origen, VERSION),
+          _meta: {
+            ui: {
+              // La vista carga app.js, ExcelJS y la plantilla desde este mismo servidor.
+              csp: { resourceDomains: [origen], connectDomains: [origen] },
+              // Pide a Claude abrirla en el panel lateral derecho.
+              preferredDisplayMode: "fullscreen",
+            },
+          },
+        }],
+      });
+    }
     case "prompts/list":
       return ok({ prompts: [] });
     default:

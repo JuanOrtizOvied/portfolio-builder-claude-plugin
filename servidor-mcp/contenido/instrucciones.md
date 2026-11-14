@@ -8,7 +8,7 @@ Las herramientas de este conector:
 |---|---|
 | `obtener_instrucciones` | Una vez por conversación, al empezar (ya lo hiciste si estás leyendo esto). |
 | `obtener_reglas_clasificacion` | Una vez por conversación, **antes de clasificar** el primer producto. |
-| `actualizar_dashboard` | Cada vez que agregues o corrijas productos. Valida, calcula y devuelve el enlace del dashboard. |
+| `actualizar_dashboard` | Cada vez que agregues o corrijas productos. Valida, calcula y **muestra el dashboard en Claude** (en el panel lateral derecho cuando está disponible), con el botón para descargar el Excel. También devuelve un enlace para guardarlo. |
 | `leer_enlace` | Cuando la persona pegue un enlace de dashboard de una sesión anterior para continuar. |
 
 ## Ciclo de cada turno
@@ -24,13 +24,13 @@ Las herramientas de este conector:
 
 4. **Actualizar.** Llama a `actualizar_dashboard` con el **estado completo**: todas las posiciones acumuladas, no solo las nuevas. Si llega un documento más reciente de la misma cuenta, reemplaza las posiciones anteriores de esa cuenta y avisa. Marca una sección `completa` o `no_aplica` solo cuando la persona lo confirme. Si la herramienta devuelve errores, corrígelos y vuelve a llamarla.
 
-5. **Responder**, en este orden:
-   - el **enlace del dashboard** como link clicable, con un texto como "Ver tu portafolio";
+5. **Responder**, en este orden (el dashboard ya aparece solo en el chat o en el panel lateral; no lo describas):
+   - una línea con el **enlace del dashboard** para guardarlo, con un texto como "Guarda este enlace para volver a tu portafolio";
    - lo que se agregó en este turno: una tabla mínima instrumento → subcategoría → USD, solo de lo nuevo;
    - las dudas puntuales (confianza baja);
    - **una sola pregunta** para seguir: primero si ya está todo en la sección que acaba de recibir productos, y luego la siguiente sección de la lista de verificación.
 
-6. **Cerrar** cuando las 6 secciones estén `completa` o `no_aplica`: entrega el enlace final y explica que en el dashboard está el botón **Descargar Excel**. Recuérdale que guarde el enlace: abriéndolo, o pegándolo en un chat nuevo, puede retomar o actualizar su portafolio cuando quiera. En el Excel, le toca completar las columnas en blanco (retornos y portafolio deseado).
+6. **Cerrar** cuando las 6 secciones estén `completa` o `no_aplica`: llama a `actualizar_dashboard` con el estado final y explica que en el dashboard está el botón **Descargar Excel**. Recuérdale que guarde el enlace: abriéndolo, o pegándolo en un chat nuevo, puede retomar o actualizar su portafolio cuando quiera. En el Excel, le toca completar las columnas en blanco (retornos y portafolio deseado).
 
 ## Reglas
 

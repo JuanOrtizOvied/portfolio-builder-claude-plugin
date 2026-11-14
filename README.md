@@ -15,6 +15,8 @@ plugins/        ← Un plugin mínimo que solo le dice a Claude "usa el conector
 
 Cada persona agrega el conector **una sola vez**. Desde ahí, cualquier cambio que publiques le llega en su próxima consulta, sin sincronizar nada ni reinstalar.
 
+**Dentro de Claude:** cuando Claude actualiza el portafolio, el dashboard aparece en el chat y se abre en el **panel lateral derecho** (si la cuenta tiene panel lateral; si no, queda dentro del chat con un botón para expandirlo). También se puede abrir en el navegador con el enlace.
+
 **Privacidad:** el dashboard es una página de tu servidor, pero los datos de la persona viajan dentro del propio enlace, en la parte después del `#`. El navegador nunca envía esa parte al servidor, así que Cloudflare no guarda ni ve los portafolios. Como el diseño se carga desde el servidor cada vez, **hasta los enlaces antiguos se ven con la versión vigente**.
 
 ---
@@ -117,7 +119,11 @@ servidor-mcp/
   contenido/guia-paso-a-paso.md
   contenido/reglas-clasificacion.md
   public/index.html            página de bienvenida (instrucciones para usuarios)
+  src/vista.ts                 vista del dashboard dentro de Claude (MCP App, panel lateral)
   public/d.html, app.js        dashboard y generación del Excel en el navegador
+  public/dashboard.css         estilos compartidos por la página y la vista de Claude
+  public/_headers              permite que la vista de Claude cargue estos archivos (CORS)
+  public/vendor/ext-apps-app.js  cliente oficial de MCP Apps
   public/categorias.json       categorías ↔ celdas de la plantilla
   public/tema.json             colores y marca
   public/plantilla-portafolio-final.xlsx

@@ -1,15 +1,16 @@
 {
   "name": "sabbi-portafolio-mcp",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "private": true,
-  "description": "Conector MCP de Sabbi: clasificación de portafolios y dashboard",
+  "description": "Conector MCP de Sabbi: clasificaci\u00f3n de portafolios y dashboard",
   "scripts": {
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
-    "postinstall": "node -e \"require('fs').copyFileSync(require.resolve('exceljs/dist/exceljs.min.js'),'public/vendor/exceljs.min.js')\""
+    "postinstall": "node -e \"const fs=require('fs');fs.copyFileSync(require.resolve('exceljs/dist/exceljs.min.js'),'public/vendor/exceljs.min.js');fs.copyFileSync('node_modules/@modelcontextprotocol/ext-apps/dist/src/app-with-deps.js','public/vendor/ext-apps-app.js')\""
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^5.20261110.1",
+    "@modelcontextprotocol/ext-apps": "^1.7.5",
     "exceljs": "4.4.0",
     "typescript": "^5.6.0",
     "wrangler": "^4.40.0"

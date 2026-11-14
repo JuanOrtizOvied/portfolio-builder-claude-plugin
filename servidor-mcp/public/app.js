@@ -4,6 +4,7 @@
 (function () {
   "use strict";
 
+  var BASE = window.SABBI_BASE || "";
   var FUERA = { EMPRESA_PRIVADA: 1, EXCLUIR: 1 };
   var ESTADOS = {
     completa: ["Completa", "✓"],
@@ -98,7 +99,8 @@
     return '<svg viewBox="0 0 180 180" class="donut" role="img" aria-label="Distribución por sección">' + out.join("") + "</svg>";
   }
 
-  function render(estado, cats, tema, version) {
+  function render(estado, cats, tema, version, opciones) {
+    opciones = opciones || {};
     var C = tema.colores, d = calcular(estado, cats), nums = Object.keys(d.secciones).sort();
     var root = document.documentElement.style;
     [["--p", C.primario], ["--a", C.acento], ["--bg", C.fondo], ["--card", C.tarjeta], ["--t", C.texto],
@@ -202,12 +204,14 @@
       '<div class="mt">' + detalle + '</div><div class="pie">' + pie + "</div></main>";
 
     var btn = document.getElementById("btn-excel");
+    var accion = opciones.onExcel || function () { return descargarExcel(estado, cats); };
     btn.addEventListener("click", function () {
       btn.disabled = true; btn.textContent = "Generando…";
-      generarExcel(estado, cats, d).catch(function (err) {
+      Promise.resolve().then(accion).catch(function (err) {
         console.error(err); alert("No se pudo generar el Excel: " + err.message);
       }).finally(function () { btn.disabled = false; btn.textContent = "Descargar Excel"; });
     });
+    if (opciones.alRenderizar) opciones.alRenderizar();
   }
 
   // ---------- Excel (plantilla oficial llena) ----------
@@ -220,9 +224,10 @@
     });
   }
 
-  async function generarExcel(estado, cats, d) {
-    await cargarScript("/vendor/exceljs.min.js");
-    var buf = await (await fetch("/plantilla-portafolio-final.xlsx")).arrayBuffer();
+  async function construirExcel(estado, cats) {
+    var d = calcular(estado, cats);
+    await cargarScript(BASE + "/vendor/exceljs.min.js");
+    var buf = await (await fetch(BASE + "/plantilla-portafolio-final.xlsx")).arrayBuffer();
     var wb = new ExcelJS.Workbook();
     await wb.xlsx.load(buf);
     var ws = wb.getWorksheet("Sheet1");
@@ -286,7 +291,7 @@
     wd.getCell(leyenda, 2).font = { name: A, size: 10 };
     wd.getCell(leyenda + 1, 2).value = "Enlace para volver a ver o continuar este portafolio:";
     wd.getCell(leyenda + 1, 2).font = { name: A, size: 10, bold: true };
-    wd.getCell(leyenda + 2, 2).value = { text: "Abrir mi dashboard", hyperlink: location.href };
+    wd.getCell(leyenda + 2, 2).value = { text: "Abrir mi dashboard", hyperlink: estado.__enlace || location.href };
     wd.getCell(leyenda + 2, 2).font = { name: A, size: 10, color: { argb: "FF0563C1" }, underline: true };
 
     // Tipos de cambio
@@ -321,6 +326,12 @@
     wb.calcProperties = Object.assign(wb.calcProperties || {}, { fullCalcOnLoad: true });
     var out = await wb.xlsx.writeBuffer();
     var nombre = "Portafolio_" + (estado.cliente || "cliente").replace(/[^\wÀ-ÿ-]+/g, "_") + "_" + (estado.fecha_corte || "") + ".xlsx";
+    return { nombre: nombre, buffer: out };
+  }
+
+  async function descargarExcel(estado, cats) {
+    var x = await construirExcel(estado, cats);
+    var nombre = x.nombre, out = x.buffer;
     var url = URL.createObjectURL(new Blob([out], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }));
     var a = document.createElement("a"); a.href = url; a.download = nombre; document.body.appendChild(a); a.click(); a.remove();
     setTimeout(function () { URL.revokeObjectURL(url); }, 5000);
@@ -335,15 +346,24 @@
       return;
     }
     try {
-      var r = await Promise.all([decodificar(frag), fetch("/categorias.json").then(function (x) { return x.json(); }),
-        fetch("/tema.json").then(function (x) { return x.json(); }),
-        fetch("/meta.json").then(function (x) { return x.json(); }).catch(function () { return {}; })]);
-      render(r[0], cargarCategorias(r[1]), r[2], r[3].version || "");
+      var r = await Promise.all([decodificar(frag), fetch(BASE + "/categorias.json").then(function (x) { return x.json(); }),
+        fetch(BASE + "/tema.json").then(function (x) { return x.json(); }),
+        fetch(BASE + "/meta.json").then(function (x) { return x.json(); }).catch(function () { return {}; })]);
+      var auto = /[?&]descargar=1/.test(location.search);
+      render(r[0], cargarCategorias(r[1]), r[2], r[3].version || "", {
+        alRenderizar: auto ? function () { document.getElementById("btn-excel").click(); } : null,
+      });
     } catch (err) {
       console.error(err);
       app.innerHTML = '<div class="vacio-total"><h2>No se pudo abrir el portafolio</h2>El enlace parece incompleto. Copia el enlace completo, incluida la parte después de “#”.</div>';
     }
   }
-  window.addEventListener("hashchange", iniciar);
-  iniciar();
+  // API para la vista dentro de Claude (MCP App)
+  window.Sabbi = {
+    render: render, cargarCategorias: cargarCategorias, construirExcel: construirExcel, descargarExcel: descargarExcel,
+  };
+  if (!window.SABBI_EMBED) {
+    window.addEventListener("hashchange", iniciar);
+    iniciar();
+  }
 })();

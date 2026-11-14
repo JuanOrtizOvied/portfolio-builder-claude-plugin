@@ -2,6 +2,14 @@
 
 Cada versión publicada aquí llega a todas las personas que instalaron el plugin.
 
+## 2.1.0 — 2026-11-14
+
+**El dashboard se ve dentro de Claude**
+- `actualizar_dashboard` ahora es una **MCP App**: Claude muestra el dashboard dentro del chat y pide abrirlo en el **panel lateral derecho** automáticamente.
+- Botones en la vista: **Descargar Excel** (descarga desde Claude), **Abrir en el navegador** y **Abrir en panel**.
+- Diseño compacto para el ancho del panel lateral.
+- Los archivos públicos se sirven con CORS (`public/_headers`) para que la vista los pueda cargar.
+
 ## 2.0.0 — 2026-11-12
 
 **Cambio de arquitectura: actualizaciones al instante**
