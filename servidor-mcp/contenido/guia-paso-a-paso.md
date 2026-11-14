@@ -21,12 +21,12 @@ Si no sabe por dónde empezar, sugiérele **su cuenta más grande**.
 
 ## Cada vez que sube algo
 
-1. Procesa los archivos nuevos y agrégalos al estado (`estado.json`). Nunca borres lo anterior; si llega un documento más reciente de la misma cuenta, **reemplaza** esas posiciones y avisa.
+1. Procesa los archivos nuevos y agrégalos al estado. Nunca borres lo anterior; si llega un documento más reciente de la misma cuenta, **reemplaza** esas posiciones y avisa.
 2. Muestra un **resumen del avance** corto:
    - qué encontraste en este documento (n.º de posiciones, total USD);
    - una tabla mínima instrumento → subcategoría → USD, solo de lo nuevo;
    - las dudas (confianza baja) en forma de pregunta concreta.
-3. Actualiza el avance por sección (ver abajo) y genera el **dashboard de avance** con `scripts/generar_dashboard.py`, para que vea cómo va tomando forma.
+3. Actualiza el avance por sección (ver abajo) y llama a `actualizar_dashboard` para que vea en el enlace cómo va tomando forma.
 4. Si este documento agregó productos a una sección que sigue sin confirmar, **pregunta primero si eso es todo lo que tiene en esa sección** ("¿Tienes algún otro fondo privado además de estos tres?"). Con un sí, márcala `completa`. El dashboard muestra esas secciones como "En progreso · falta confirmar".
 5. Cierra con **la siguiente pregunta de la lista de verificación**.
 
@@ -50,10 +50,10 @@ Para inmuebles, club deals y empresas propias no suele haber estado de cuenta: a
 
 Cuando las 6 secciones estén `completa` o `no_aplica`:
 
-1. Genera el Excel final con `scripts/llenar_plantilla.py`.
-2. Genera el dashboard final con `--excel` para que tenga el botón **Descargar Excel**.
-3. Entrega el dashboard como resultado principal y el Excel como descarga.
+1. Llama a `actualizar_dashboard` con el estado final.
+2. Entrega el enlace del dashboard como resultado principal: ahí está el botón **Descargar Excel**.
+3. Pídele que guarde el enlace para volver a verlo o actualizarlo.
 
 ## Si la persona vuelve otro día
 
-Pídele que suba el último Excel que le entregó el plugin y corre `scripts/importar_excel.py`. Así se recupera todo lo avanzado, incluidas las correcciones que haya hecho a mano en el Excel. Después sigue con la siguiente sección pendiente.
+Pídele que pegue el enlace de su dashboard y llama a `leer_enlace`. Así se recupera todo lo avanzado. Después sigue con la siguiente sección pendiente.

@@ -1,105 +1,132 @@
-# Plugins de Sabbi para Claude
+# Sabbi · Portafolio para Claude
 
-Este repositorio es un **marketplace de plugins** para Claude. Contiene:
+Claude acompaña a la persona paso a paso: sube sus estados de cuenta, capturas, PDFs y factsheets cuando los tenga, y Claude clasifica cada producto en las categorías y subcategorías de la plantilla de Sabbi (Inversiones Directas, Mercados Privados, Club Deals, Mercados Públicos, Otros, Cash). El resultado es un **dashboard** con un botón para **descargar el Excel**.
 
-| Plugin | Qué hace |
+## Cómo está armado
+
+```
+servidor-mcp/   ← EL CEREBRO. Un servidor en Cloudflare con las reglas, categorías,
+                  guía y diseño del dashboard. Claude lo consulta cada vez.
+                  Cambias algo aquí, haces push y TODOS lo ven al instante.
+
+plugins/        ← Un plugin mínimo que solo le dice a Claude "usa el conector de Sabbi".
+                  Casi nunca necesita cambios.
+```
+
+Cada persona agrega el conector **una sola vez**. Desde ahí, cualquier cambio que publiques le llega en su próxima consulta, sin sincronizar nada ni reinstalar.
+
+**Privacidad:** el dashboard es una página de tu servidor, pero los datos de la persona viajan dentro del propio enlace, en la parte después del `#`. El navegador nunca envía esa parte al servidor, así que Cloudflare no guarda ni ve los portafolios. Como el diseño se carga desde el servidor cada vez, **hasta los enlaces antiguos se ven con la versión vigente**.
+
+---
+
+## 1. Publicar el servidor en Cloudflare (una sola vez)
+
+### Opción A — desde el panel de Cloudflare, con despliegue automático (recomendada)
+
+1. Crea una cuenta gratuita en [dash.cloudflare.com](https://dash.cloudflare.com).
+2. Ve a **Workers & Pages → Create** y elige importar un repositorio de GitHub (**Import a repository**). Autoriza a Cloudflare a leer tu repositorio.
+3. Selecciona este repositorio y configura:
+   - **Root directory / Path:** `servidor-mcp`
+   - **Deploy command:** `npx wrangler deploy` (suele venir por defecto)
+4. Haz clic en **Deploy**. Al terminar, Cloudflare te da una URL del tipo
+   `https://sabbi-portafolio.TU-SUBDOMINIO.workers.dev`
+
+A partir de ahí, **cada push a `main` vuelve a publicar el servidor solo** (tarda alrededor de un minuto).
+
+### Opción B — desde la terminal
+
+```bash
+cd servidor-mcp
+npm install
+npx wrangler login     # abre el navegador para iniciar sesión en Cloudflare
+npx wrangler deploy
+```
+
+### Después de publicar
+
+Abre `https://sabbi-portafolio.TU-SUBDOMINIO.workers.dev/`. Es la página de bienvenida con las instrucciones y la URL exacta del conector. **Esa es la página que les compartes a tus usuarios.**
+
+Luego reemplaza `TU-SUBDOMINIO` por tu subdominio real en estos dos archivos y haz push:
+- `plugins/portafolio-builder/.mcp.json`
+- `plugins/portafolio-builder/skills/construir-portafolio/SKILL.md`
+
+---
+
+## 2. Para usuarios: activar (una sola vez)
+
+1. En claude.ai o en la app de escritorio, abre **Customize → Connectors**.
+2. Haz clic en **+ → Add custom connector**.
+3. Nombre: **Sabbi Portafolio**. URL: `https://sabbi-portafolio.TU-SUBDOMINIO.workers.dev/mcp`
+4. Haz clic en **Add**. No pide usuario ni contraseña.
+
+Después, en un chat nuevo con el conector activado:
+
+> Quiero armar mi portafolio
+
+Para continuar otro día, basta con pegar en un chat nuevo el enlace del dashboard.
+
+*(Opcional)* También pueden instalar el plugin desde este repositorio: Customize → Plugins → + → Add marketplace → Add from a repository. El plugin ayuda a que Claude use el conector en cuanto alguien suba documentos de inversión. El conector funciona igual sin él.
+
+---
+
+## 3. Publicar cambios (el día a día)
+
+| Quiero cambiar… | Archivo |
 |---|---|
-| `portafolio-builder` | Guía a la persona paso a paso: sube sus estados de cuenta, capturas, PDFs y factsheets cuando los tenga, y Claude clasifica cada producto en las categorías y subcategorías de la plantilla (Inversiones Directas, Mercados Privados, Club Deals, Mercados Públicos, Otros, Cash). El resultado es un dashboard con el Excel descargable. |
+| Colores, marca o título del dashboard | `servidor-mcp/public/tema.json` |
+| Cómo se clasifica un producto | `servidor-mcp/contenido/reglas-clasificacion.md` |
+| Las preguntas o el orden de la guía | `servidor-mcp/contenido/guia-paso-a-paso.md` |
+| El flujo general que sigue Claude | `servidor-mcp/contenido/instrucciones.md` |
+| Categorías o subcategorías | `servidor-mcp/public/categorias.json` y `servidor-mcp/public/plantilla-portafolio-final.xlsx` (las celdas deben coincidir) |
+| El diseño del dashboard o el Excel | `servidor-mcp/public/d.html` y `servidor-mcp/public/app.js` |
 
----
-
-## Para usuarios: instalar (una sola vez)
-
-Necesitas un plan de pago de Claude (Pro, Max, Team o Enterprise).
-
-### En la app de Claude (web o escritorio)
-
-1. Abre **Customize** en la barra lateral izquierda y entra a la pestaña **Plugins**.
-2. En **Personal plugins**, haz clic en **+** → **Add marketplace** → **Add from a repository**.
-3. Pega: `USUARIO-GITHUB/NOMBRE-REPO` (lo reemplaza el administrador; ver abajo) y haz clic en **Sync**.
-4. En **Browse plugins** → pestaña **Personal**, instala **portafolio-builder**.
-
-### En Claude Code
-
-```
-/plugin marketplace add USUARIO-GITHUB/NOMBRE-REPO
-/plugin install portafolio-builder@sabbi-plugins
-```
-
-Luego activa la actualización automática: `/plugin` → pestaña **Marketplaces** → `sabbi-plugins` → **Enable auto-update**.
-
-### Cómo usarlo
-
-En una conversación nueva escribe algo como:
-
-> Quiero armar mi portafolio.
-
-No necesitas tener todo listo. Sube lo que tengas a mano (una captura, un PDF). Claude lo clasifica, te muestra el dashboard con tu avance y te pide lo siguiente, sección por sección. Al final tienes el dashboard completo con el botón **Descargar Excel**.
-
-Si quieres seguir otro día, sube el último Excel que te dio Claude y escribe *"continuemos mi portafolio"*.
-
----
-
-## Para el administrador: publicar cambios
-
-Todo cambio que se suba a la rama `main` de este repositorio llega a quienes instalaron el marketplace.
-
-1. Edita lo que necesites:
-   - Instrucciones del flujo: `plugins/portafolio-builder/skills/construir-portafolio/SKILL.md`
-   - Reglas de clasificación: `.../references/reglas-clasificacion.md`
-   - Categorías y celdas: `.../assets/categorias.json`
-   - Plantilla: `.../assets/plantilla-portafolio-final.xlsx` (si mueves filas, actualiza las celdas en `categorias.json`)
-   - Colores y marca del dashboard: `.../assets/tema.json`
-   - Cómo guía Claude a la persona: `.../references/guia-paso-a-paso.md`
-2. **Sube el número de versión** en ambos archivos (deben coincidir):
-   - `plugins/portafolio-builder/.claude-plugin/plugin.json` → `"version"`
-   - `.claude-plugin/marketplace.json` → `"version"` del plugin
+Pasos:
+1. Edita el archivo (desde la web de GitHub también se puede).
+2. Sube la versión en `servidor-mcp/package.json` (por ejemplo, `2.0.0` → `2.0.1`). Es la que aparece en el pie del dashboard.
 3. Anota el cambio en `CHANGELOG.md`.
-4. Haz commit y push a `main`.
+4. Commit y push a `main`. Con la opción A, Cloudflare publica solo. Con la opción B, corre `npx wrangler deploy`.
 
-Sin el cambio de versión, Claude puede considerar que no hay nada nuevo y no actualizar.
+### Demo de actualización
 
-### Ejemplo de actualización: cambiar un color
-
-Es la forma más simple de demostrar que las actualizaciones llegan a todos:
-
-1. En `assets/tema.json` cambia `"acento": "#C9A227"` por otro color, por ejemplo `"#2A9D8F"` (verde azulado).
-2. Sube la versión a `1.1.1` en `plugin.json` y `marketplace.json`.
-3. Commit y push.
-4. Cualquier usuario que genere un dashboard después de que su Claude se sincronice verá el nuevo color en el botón y en la marca. El pie del dashboard muestra la versión con la que se generó (*Generado por portafolio-builder v1.1.1*), así se puede comprobar qué versión tiene cada persona.
-
-### Probar antes de publicar
-
-- **Excel:** `python plugins/portafolio-builder/skills/construir-portafolio/scripts/llenar_plantilla.py ejemplos/posiciones-ejemplo.json prueba.xlsx`
-- **Dashboard a medio avance:** `python plugins/portafolio-builder/skills/construir-portafolio/scripts/generar_dashboard.py ejemplos/estado-parcial.json prueba-parcial.html`
-- **Dashboard final con Excel:** `python plugins/portafolio-builder/skills/construir-portafolio/scripts/generar_dashboard.py ejemplos/posiciones-ejemplo.json prueba.html --excel prueba.xlsx`
-- **Plugin completo en Claude Code:** `claude --plugin-dir ./plugins/portafolio-builder`
-- **Validar manifiestos:** `claude plugin validate .`
-
-### Privacidad
-
-El repositorio debe ser **público** para que cuentas personales lo puedan agregar. No subas aquí documentos ni datos de clientes. Solo deben estar la plantilla vacía, las reglas, los scripts y los ejemplos ficticios.
+1. En `servidor-mcp/public/tema.json` cambia `"acento": "#C9A227"` por `"#2A9D8F"`.
+2. Sube la versión a `2.0.1` en `servidor-mcp/package.json` y haz push.
+3. Espera a que Cloudflare termine de publicar (alrededor de un minuto) y **recarga cualquier dashboard abierto**, incluso uno creado antes: el botón ya sale verde azulado y el pie dice v2.0.1.
 
 ---
+
+## Probar en local
+
+```bash
+cd servidor-mcp
+npm install
+npx wrangler dev        # http://localhost:8787
+```
+
+- Página de inicio: `http://localhost:8787/`
+- Endpoint MCP: `http://localhost:8787/mcp`
+- Los datos ficticios para probar están en `ejemplos/`.
 
 ## Estructura
 
 ```
-.claude-plugin/marketplace.json        catálogo del marketplace
-plugins/portafolio-builder/
-  .claude-plugin/plugin.json           manifiesto del plugin
-  skills/construir-portafolio/
-    SKILL.md                           flujo que sigue Claude
-    references/guia-paso-a-paso.md     cómo guiar a la persona, sección por sección
-    references/reglas-clasificacion.md cómo clasificar cada instrumento
-    references/formato-entrada.md      formato del archivo de avance (estado.json)
-    assets/categorias.json             códigos de categoría ↔ celdas de la plantilla
-    assets/tema.json                   colores y marca del dashboard
-    assets/plantilla-portafolio-final.xlsx
-    scripts/generar_dashboard.py       genera el dashboard (parcial o final)
-    scripts/llenar_plantilla.py        genera el Excel final
-    scripts/importar_excel.py          retoma el avance desde un Excel anterior
-ejemplos/estado-parcial.json           datos ficticios: portafolio a medias
-ejemplos/posiciones-ejemplo.json       datos ficticios: portafolio completo
-CHANGELOG.md                           historial de versiones
+servidor-mcp/
+  src/index.ts                 rutas del Worker (/mcp, /meta.json, archivos públicos)
+  src/mcp.ts                   servidor MCP: herramientas que usa Claude
+  src/portafolio.ts            validación, resumen y codificación del enlace
+  contenido/instrucciones.md   flujo que sigue Claude
+  contenido/guia-paso-a-paso.md
+  contenido/reglas-clasificacion.md
+  public/index.html            página de bienvenida (instrucciones para usuarios)
+  public/d.html, app.js        dashboard y generación del Excel en el navegador
+  public/categorias.json       categorías ↔ celdas de la plantilla
+  public/tema.json             colores y marca
+  public/plantilla-portafolio-final.xlsx
+  public/vendor/exceljs.min.js librería para generar el Excel
+  wrangler.toml, package.json  configuración de Cloudflare
+plugins/portafolio-builder/    plugin mínimo (skill + .mcp.json)
+.claude-plugin/marketplace.json
+ejemplos/                      datos ficticios
+CHANGELOG.md
 ```
+
+No subas a este repositorio documentos ni datos de clientes.

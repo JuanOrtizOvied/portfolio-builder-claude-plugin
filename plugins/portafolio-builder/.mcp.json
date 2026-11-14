@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "sabbi-portafolio": {
+      "type": "http",
+      "url": "https://sabbi-portafolio.TU-SUBDOMINIO.workers.dev/mcp"
+    }
+  }
+}

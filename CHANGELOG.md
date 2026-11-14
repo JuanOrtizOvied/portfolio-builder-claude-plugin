@@ -2,6 +2,15 @@
 
 Cada versión publicada aquí llega a todas las personas que instalaron el plugin.
 
+## 2.0.0 — 2026-11-12
+
+**Cambio de arquitectura: actualizaciones al instante**
+- Toda la lógica pasa a un **servidor MCP en Cloudflare** (`servidor-mcp/`): instrucciones, reglas, categorías, guía y diseño del dashboard. Cada persona lo agrega una sola vez como conector y desde ahí siempre usa la última versión, sin sincronizar nada.
+- El **dashboard** ahora es una página del servidor. Los datos viajan dentro del enlace (después del `#`) y no se guardan en ningún servidor. Los enlaces antiguos se ven con el diseño vigente.
+- El **Excel** se genera en el navegador con el botón "Descargar Excel", sobre la plantilla oficial.
+- Para **retomar**, basta con pegar el enlace del dashboard en un chat nuevo.
+- El plugin queda mínimo: solo le indica a Claude que use el conector.
+
 ## 1.1.1 — 2026-11-12
 
 **Correcciones**

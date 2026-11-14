@@ -7,5 +7,3 @@ __pycache__/
 *.jpg
 prueba*.xlsx
 Portafolio_*.xlsx
-*.html
-!ejemplos/*.html

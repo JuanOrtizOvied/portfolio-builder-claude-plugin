@@ -1,0 +1,14 @@
+name = "sabbi-portafolio"
+main = "src/index.ts"
+compatibility_date = "2026-11-01"
+
+# Archivos públicos: plantilla Excel, categorías, tema, script del dashboard y ExcelJS.
+[assets]
+directory = "./public"
+binding = "ASSETS"
+
+# Los .md de contenido/ se importan como texto dentro del Worker.
+[[rules]]
+type = "Text"
+globs = ["**/*.md"]
+fallthrough = true
