@@ -30,9 +30,9 @@ window.SABBI_EMBED = true;
 window.SABBI_BASE = ${js(origen)};
 window.SABBI_DATOS = { categorias: ${js(categorias)}, tema: ${js(tema)}, version: ${js(version)} };
 </script>
-<script src="${origen}/app.js"></script>
+<script src="${origen}/app.js?v=${version}"></script>
 <script type="module">
-import { App } from "${origen}/vendor/ext-apps-app.js";
+import { App } from "${origen}/vendor/ext-apps-app.js?v=${version}";
 
 const XLSX = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 const app = new App({ name: "Sabbi Portafolio", version: SABBI_DATOS.version },
