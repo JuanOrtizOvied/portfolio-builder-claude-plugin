@@ -4,7 +4,7 @@ import guia from "../contenido/guia-paso-a-paso.md";
 import reglas from "../contenido/reglas-clasificacion.md";
 import meta from "../package.json";
 import { MIME_APP, VISTA_URI, htmlVista } from "./vista";
-import { CATEGORIAS, CODIGOS, Estado, FUERA, codificar, decodificar, etiqueta, resumir, validar } from "./portafolio";
+import { CATEGORIAS, Estado, FUERA, codificar, decodificar, etiqueta, resumir, validar } from "./portafolio";
 
 const VERSIONES_PROTOCOLO = ["2025-11-25", "2025-06-18", "2025-03-26", "2024-11-05"];
 export const VERSION = meta.version;
@@ -39,7 +39,7 @@ const esquemaEstado = {
           cuenta: { type: "string" },
           instrumento: { type: "string" },
           ticker_isin: { type: "string" },
-          categoria: { type: "string", enum: CODIGOS, description: "Código de categoría (ver obtener_reglas_clasificacion)." },
+          categoria: { type: "string", description: "Código de categoría. Obtén la lista vigente con obtener_reglas_clasificacion; el servidor valida y rechaza los códigos desconocidos." },
           monto: { type: "number", description: "Valor de mercado en la moneda original." },
           moneda: { type: "string", description: "ISO: USD, PEN, EUR…" },
           fuente: { type: "string", description: "Archivo y página de donde sale el dato." },
