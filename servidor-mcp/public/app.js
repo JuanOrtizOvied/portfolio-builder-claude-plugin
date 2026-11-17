@@ -193,12 +193,24 @@
       (tcTxt ? " · Tipo de cambio por US$1 — " + e(tcTxt) : "") + " · Montos a valor de mercado según los documentos entregados." +
       "<br>Tus datos están dentro de este enlace y no se guardan en ningún servidor. Guárdalo para volver a verlo.";
 
+    var porMoneda = {};
+    d.filas.forEach(function (f) {
+      if (FUERA[f.categoria]) return;
+      var m = (f.moneda || "USD").toUpperCase();
+      porMoneda[m] = (porMoneda[m] || 0) + (Number(f.usd) || 0);
+    });
+    var expChips = Object.keys(porMoneda).sort(function (a, b) { return porMoneda[b] - porMoneda[a]; }).map(function (m) {
+      return '<div class="chip"><span class="chip-n">' + e(m) + '</span><span class="chip-x">' + usd(porMoneda[m]) + " · " + pct(d.total ? porMoneda[m] / d.total : 0) + "</span></div>";
+    }).join("");
+    var monedaCard = expChips ? '<section class="card"><h2>Exposición por moneda</h2><div class="chips">' + expChips + "</div></section>" : "";
+
     document.getElementById("app").innerHTML =
       '<div class="top"><div class="top-in"><div class="marca">' + e(tema.marca) + '</div><div class="top-row"><div><h1>' + e(tema.titulo) +
       '</h1><div class="meta">' + e(estado.cliente || "") + " · Fecha de corte " + e(estado.fecha_corte || "s/f") +
       '</div></div><button class="btn" id="btn-excel">Descargar Excel</button></div></div></div>' +
       '<main class="wrap"><div class="card">' + banner + '<div class="chips">' + chips + "</div></div>" +
       '<div class="kpis">' + kpis + "</div>" +
+      monedaCard +
       '<section class="card"><h2>Distribución por sección</h2><div class="dist">' + donut(d, tema) + "<div>" + leyenda + "</div></div></section>" +
       rev + '<h2 class="mt">Categorías y subcategorías</h2><div class="grid">' + tarjetas + "</div>" +
       '<div class="mt">' + detalle + '</div><div class="pie">' + pie + "</div></main>";

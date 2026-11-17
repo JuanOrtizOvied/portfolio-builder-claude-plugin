@@ -1,6 +1,6 @@
 {
   "name": "sabbi-portafolio-mcp",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "private": true,
   "description": "Conector MCP de Sabbi: clasificaci\u00f3n de portafolios y dashboard",
   "scripts": {
