@@ -50,11 +50,23 @@ gives for free, social-provider setup beyond email/password for the spike.
 - Consent + login page must be publicly reachable (Claude's browser hits it). Plan: serve it
   from the same Worker, and set Supabase **Site URL** to the Worker origin. (User dashboard action.)
 
+## GOTCHA: two Workers / name mismatch (found 2026-11-18)
+- `wrangler.toml` name has ALWAYS been `sabbi-portafolio` → `wrangler deploy` targets
+  `https://sabbi-portafolio.sabbi-tecnologia.workers.dev`. New code lives here (verified).
+- The Claude connector points at `https://portfolio-builder-claude-plugin.sabbi-tecnologia.workers.dev/mcp`,
+  a DIFFERENT Worker serving OLD code (v2.1.2, no metadata). No local CI deploys it → almost
+  certainly a Cloudflare dashboard Git integration (Workers Builds) named after the repo.
+- Decision pending: which URL is canonical going forward. Feature forces a reconnect anyway
+  (auth mode → "sign in when needed"), so the URL choice is flexible. For the spike, standardize
+  on `sabbi-portafolio.*` (directly deployable via `wrangler deploy`).
+
 ## Tasks
 
 ### Spike (de-risk) — prove OAuth works end-to-end before building the feature
-- [ ] T1 — Serve OAuth protected-resource metadata (RFC 9728) from the Worker; stop 404 on
+- [x] T1 — Serve OAuth protected-resource metadata (RFC 9728) from the Worker; stop 404 on
       `/.well-known/oauth-protected-resource`; add a 401 + `WWW-Authenticate` helper. (index.ts, new auth.ts)
+      VERIFIED LIVE 2026-11-18 on `https://sabbi-portafolio.sabbi-tecnologia.workers.dev/.well-known/oauth-protected-resource/mcp`
+      → returns `{resource, authorization_servers:[supabase], bearer_methods_supported}`. `jose` bundles fine on Workers.
 - [ ] T2 — Validate incoming Bearer JWT against Supabase JWKS (ES256); check iss/exp; extract `sub`. (auth.ts)
 - [ ] T3 — Add spike protected tool `whoami`: anonymous call → HTTP 401 challenge; valid token → returns `sub`. (mcp.ts)
 - [ ] T4 — Serve a minimal consent + login page at `/oauth/consent` from the Worker (browser,
@@ -89,4 +101,12 @@ gives for free, social-provider setup beyond email/password for the spike.
 
 ## Progress log
 - 2026-11-18: Supabase OAuth server verified live (discovery endpoint returns valid metadata,
-  DCR enabled). Feature document created. No source code written yet.
+  DCR enabled). Feature document created.
+- 2026-11-18: T1–T3 code written and committed on branch `feat/session-persistence-oauth`
+  (commit `f772d51`). New `src/auth.ts` (protected-resource metadata, 401 challenge, ES256 JWT
+  verify against Supabase JWKS, extract `sub`); `index.ts` serves the metadata; `mcp.ts` adds the
+  protected `whoami` tool + login gate; `package.json` adds `jose`. Route: inline (small, coupled,
+  security-sensitive). Decision: consent/login page will be served from the same Worker; Site URL
+  → Worker origin (user dashboard action, pending). NOT yet checked off: no deploy/typecheck
+  possible in this env (no node_modules/network); verification of record is `wrangler deploy` +
+  the T5 end-to-end test. Token audience validation deferred to T9 (noted in code).
