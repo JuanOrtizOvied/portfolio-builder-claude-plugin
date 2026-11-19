@@ -196,15 +196,20 @@ async function llamarHerramienta(nombre: string, args: any, origen: string, usua
 
     case "actualizar_dashboard": {
       const estado: Estado = args?.estado;
-      const { errores, tc } = validar(estado);
+      const { errores } = validar(estado);
       if (errores.length) return texto(`No se generó el dashboard. Corrige y vuelve a llamar:\n- ${errores.join("\n- ")}`, true);
-      const enlace = `${origen}/d#${await codificar(estado)}`;
-      const resumen = resumir(estado, tc);
-      return {
-        ...texto(JSON.stringify({ version: VERSION, enlace_dashboard: enlace, resumen,
-          nota: "El dashboard ya se muestra en el chat o en el panel lateral. Da también el enlace para guardarlo." }, null, 2)),
-        structuredContent: { version: VERSION, enlace_dashboard: enlace, resumen, estado },
-      };
+      // Guardado automático: si la persona inició sesión, cada actualización del
+      // dashboard persiste su portafolio. Anónimo = solo se muestra (tool pública).
+      let nota = "El dashboard ya se muestra en el chat o en el panel lateral. Da también el enlace para guardarlo.";
+      if (usuario) {
+        try {
+          await guardarPortafolio(usuario, estado);
+          nota = "El dashboard ya se muestra y tu portafolio quedó guardado en tu cuenta automáticamente.";
+        } catch (e: any) {
+          nota = `El dashboard ya se muestra, pero no pude guardar en tu cuenta: ${e?.message || e}`;
+        }
+      }
+      return await resultadoDashboard(estado, origen, { nota, guardado: !!usuario });
     }
 
     case "leer_enlace": {
