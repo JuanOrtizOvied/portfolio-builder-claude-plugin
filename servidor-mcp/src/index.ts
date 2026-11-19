@@ -4,6 +4,7 @@
 //   /meta.json  versión vigente, la usa el dashboard para mostrarla en el pie
 //   /           página de inicio con instrucciones (public/index.html)
 import { manejarMcp, VERSION } from "./mcp";
+import { metadataRecursoProtegido, rutaMetadataRecurso } from "./auth";
 
 interface Env {
   ASSETS: Fetcher;
@@ -19,8 +20,16 @@ export default {
       return Response.json({ version: VERSION }, { headers: { "Cache-Control": "no-store" } });
     }
 
-    // Conector público: sin OAuth. Claude consulta estas rutas para saber si
-    // hace falta autenticación; un 404 le indica que no.
+    // Recurso protegido (RFC 9728): Claude lee estos metadatos para descubrir el
+    // Authorization Server (Supabase) cuando una herramienta protegida devuelve 401.
+    if (rutaMetadataRecurso(url.pathname)) {
+      return Response.json(metadataRecursoProtegido(url.origin), {
+        headers: { "Access-Control-Allow-Origin": "*", "Cache-Control": "no-store" },
+      });
+    }
+
+    // El resto de /.well-known/ no existe: el Authorization Server es Supabase,
+    // no este Worker, y se descubre vía los metadatos de arriba.
     if (url.pathname.startsWith("/.well-known/")) return new Response("Not found", { status: 404 });
 
     return env.ASSETS.fetch(req);

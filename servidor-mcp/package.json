@@ -8,6 +8,9 @@
     "deploy": "wrangler deploy",
     "postinstall": "node -e \"const fs=require('fs');fs.copyFileSync(require.resolve('exceljs/dist/exceljs.min.js'),'public/vendor/exceljs.min.js');fs.copyFileSync('node_modules/@modelcontextprotocol/ext-apps/dist/src/app-with-deps.js','public/vendor/ext-apps-app.js')\""
   },
+  "dependencies": {
+    "jose": "^5.9.6"
+  },
   "devDependencies": {
     "@cloudflare/workers-types": "^5.20261110.1",
     "@modelcontextprotocol/ext-apps": "^1.7.5",

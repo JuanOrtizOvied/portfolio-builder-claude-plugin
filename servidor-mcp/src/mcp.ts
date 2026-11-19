@@ -5,6 +5,7 @@ import reglas from "../contenido/reglas-clasificacion.md";
 import meta from "../package.json";
 import { MIME_APP, VISTA_URI, htmlVista } from "./vista";
 import { CATEGORIAS, Estado, FUERA, codificar, decodificar, etiqueta, resumir, validar } from "./portafolio";
+import { Usuario, reto401, usuarioDeLaPeticion } from "./auth";
 
 const VERSIONES_PROTOCOLO = ["2025-11-25", "2025-06-18", "2025-03-26", "2024-11-05"];
 export const VERSION = meta.version;
@@ -91,14 +92,42 @@ const HERRAMIENTAS = [
     },
     annotations: { readOnlyHint: true },
   },
+  {
+    name: "whoami",
+    title: "Quién soy (prueba de login)",
+    description:
+      "Herramienta de prueba del inicio de sesión. Requiere cuenta: cuando la persona inicia sesión, devuelve su identificador de usuario. Úsala solo para verificar que el login con Supabase funciona.",
+    inputSchema: { type: "object", properties: {} },
+    annotations: { readOnlyHint: true },
+  },
 ];
+
+// Herramientas que exigen cuenta (opción 2). El resto es público y anónimo.
+const HERRAMIENTAS_PROTEGIDAS = new Set(["whoami"]);
+
+function necesitaLogin(cuerpo: any): boolean {
+  const mensajes = Array.isArray(cuerpo) ? cuerpo : [cuerpo];
+  return mensajes.some((m) => m?.method === "tools/call" && HERRAMIENTAS_PROTEGIDAS.has(m?.params?.name));
+}
 
 function texto(t: string, isError = false) {
   return { content: [{ type: "text", text: t }], ...(isError ? { isError: true } : {}) };
 }
 
-async function llamarHerramienta(nombre: string, args: any, origen: string) {
+async function llamarHerramienta(nombre: string, args: any, origen: string, usuario: Usuario | null) {
   switch (nombre) {
+    case "whoami": {
+      // manejarMcp ya devolvió 401 si no había token válido; aquí usuario existe.
+      if (!usuario) return texto("No autenticado.", true);
+      return texto(
+        JSON.stringify(
+          { sub: usuario.sub, email: usuario.email ?? null, nota: "Token validado por el Worker contra Supabase." },
+          null,
+          2,
+        ),
+      );
+    }
+
     case "obtener_instrucciones":
       return texto(`Versión vigente del conector: ${VERSION}\n\n${instrucciones}\n\n---\n\n${guia}`);
 
@@ -134,7 +163,7 @@ async function llamarHerramienta(nombre: string, args: any, origen: string) {
   return null;
 }
 
-async function atender(msg: any, origen: string): Promise<any | null> {
+async function atender(msg: any, origen: string, usuario: Usuario | null): Promise<any | null> {
   const { id, method, params } = msg || {};
   const esNotificacion = id === undefined || id === null;
   const ok = (result: any) => ({ jsonrpc: "2.0", id, result });
@@ -158,7 +187,7 @@ async function atender(msg: any, origen: string): Promise<any | null> {
     case "tools/list":
       return ok({ tools: HERRAMIENTAS });
     case "tools/call": {
-      const r = await llamarHerramienta(params?.name, params?.arguments, origen);
+      const r = await llamarHerramienta(params?.name, params?.arguments, origen, usuario);
       return r ? ok(r) : err(-32602, `Herramienta desconocida: ${params?.name}`);
     }
     case "resources/list":
@@ -201,8 +230,14 @@ export async function manejarMcp(req: Request): Promise<Response> {
   } catch {
     return Response.json({ jsonrpc: "2.0", id: null, error: { code: -32700, message: "JSON inválido" } }, { status: 400 });
   }
+  // Opción 2: solo las herramientas protegidas exigen cuenta. Si la petición
+  // llama a una de ellas sin un token válido, devolvemos 401 para que Claude
+  // inicie el flujo OAuth con Supabase.
+  const usuario = await usuarioDeLaPeticion(req);
+  if (necesitaLogin(cuerpo) && !usuario) return reto401(origen);
+
   const lote = Array.isArray(cuerpo);
-  const respuestas = (await Promise.all((lote ? cuerpo : [cuerpo]).map((m: any) => atender(m, origen)))).filter(Boolean);
+  const respuestas = (await Promise.all((lote ? cuerpo : [cuerpo]).map((m: any) => atender(m, origen, usuario)))).filter(Boolean);
   if (!respuestas.length) return new Response(null, { status: 202 });
   return Response.json(lote ? respuestas : respuestas[0]);
 }
