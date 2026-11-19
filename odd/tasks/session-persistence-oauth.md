@@ -82,9 +82,13 @@ gives for free, social-provider setup beyond email/password for the spike.
 **SPIKE COMPLETE — all unknowns resolved. OAuth end-to-end works. Proceeding to feature phase.**
 
 ### Feature (only if spike passes)
-- [ ] T6 — Supabase table `portfolios` (user_id PK, state jsonb, updated_at) + RLS per user.
-- [ ] T7 — `guardar_mi_portafolio` protected tool: upsert the user's state.
-- [ ] T8 — `cargar_mi_ultimo_portafolio` protected tool: read the user's last state.
+- [x] T6 — Supabase table `portfolios` (user_id PK, state jsonb, updated_at) + RLS per user.
+      SQL at `servidor-mcp/supabase/portfolios.sql` (commit `591e1a1`). APPLIED by user 2026-11-18.
+- [~] T7 — `guardar_mi_portafolio` protected tool: upsert the user's state. Code committed `984ce10`.
+      Worker forwards user JWT to Supabase REST (RLS). Pending: deploy + live test.
+- [~] T8 — `cargar_mi_ultimo_portafolio` protected tool: read the user's last state + render dashboard.
+      Code committed `984ce10`. Pending: deploy + live test. RISK: confirm `sb_publishable_` key works
+      as REST `apikey`, and that the OAuth access token authorizes PostgREST (RLS auth.uid()).
 - [ ] T9 — Wire into instrucciones + dashboard; update privacy footer and tool descriptions.
 - [ ] T10 — Polish consent/login UI (Sabbi brand; fix card centering). Remove the self-registration
       ("Crear una") toggle — users are provisioned manually, not self-signup.
