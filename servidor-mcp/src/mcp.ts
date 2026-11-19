@@ -6,6 +6,7 @@ import meta from "../package.json";
 import { MIME_APP, VISTA_URI, htmlVista } from "./vista";
 import { CATEGORIAS, Estado, FUERA, codificar, decodificar, etiqueta, resumir, validar } from "./portafolio";
 import { Usuario, reto401, usuarioDeLaPeticion } from "./auth";
+import { cargarPortafolio, guardarPortafolio } from "./almacen";
 
 const VERSIONES_PROTOCOLO = ["2025-11-25", "2025-06-18", "2025-03-26", "2024-11-05"];
 export const VERSION = meta.version;
@@ -100,10 +101,26 @@ const HERRAMIENTAS = [
     inputSchema: { type: "object", properties: {} },
     annotations: { readOnlyHint: true },
   },
+  {
+    name: "guardar_mi_portafolio",
+    title: "Guardar mi portafolio",
+    description:
+      "Guarda el portafolio de la persona en su cuenta para recuperarlo después desde otro chat. REQUIERE INICIAR SESIÓN. Úsala cuando la persona pida guardar su portafolio en su cuenta. Envía el estado COMPLETO.",
+    inputSchema: { type: "object", properties: { estado: esquemaEstado }, required: ["estado"] },
+  },
+  {
+    name: "cargar_mi_ultimo_portafolio",
+    title: "Cargar mi último portafolio",
+    description:
+      "Recupera el último portafolio que la persona guardó en su cuenta y lo muestra en el dashboard. REQUIERE INICIAR SESIÓN. Úsala al inicio de un chat nuevo cuando la persona quiera retomar su portafolio guardado.",
+    inputSchema: { type: "object", properties: {} },
+    annotations: { readOnlyHint: true },
+    _meta: { ui: { resourceUri: VISTA_URI }, "ui/resourceUri": VISTA_URI },
+  },
 ];
 
 // Herramientas que exigen cuenta (opción 2). El resto es público y anónimo.
-const HERRAMIENTAS_PROTEGIDAS = new Set(["whoami"]);
+const HERRAMIENTAS_PROTEGIDAS = new Set(["whoami", "guardar_mi_portafolio", "cargar_mi_ultimo_portafolio"]);
 
 function necesitaLogin(cuerpo: any): boolean {
   const mensajes = Array.isArray(cuerpo) ? cuerpo : [cuerpo];
@@ -112,6 +129,17 @@ function necesitaLogin(cuerpo: any): boolean {
 
 function texto(t: string, isError = false) {
   return { content: [{ type: "text", text: t }], ...(isError ? { isError: true } : {}) };
+}
+
+// Respuesta que hace que Claude muestre el dashboard (enlace + structuredContent).
+async function resultadoDashboard(estado: Estado, origen: string, extra: Record<string, unknown> = {}) {
+  const { tc } = validar(estado);
+  const enlace = `${origen}/d#${await codificar(estado)}`;
+  const resumen = resumir(estado, tc);
+  return {
+    ...texto(JSON.stringify({ version: VERSION, enlace_dashboard: enlace, resumen, ...extra }, null, 2)),
+    structuredContent: { version: VERSION, enlace_dashboard: enlace, resumen, estado },
+  };
 }
 
 async function llamarHerramienta(nombre: string, args: any, origen: string, usuario: Usuario | null) {
@@ -126,6 +154,34 @@ async function llamarHerramienta(nombre: string, args: any, origen: string, usua
           2,
         ),
       );
+    }
+
+    case "guardar_mi_portafolio": {
+      if (!usuario) return texto("Necesitas iniciar sesión para guardar tu portafolio.", true);
+      const estado: Estado = args?.estado;
+      const { errores } = validar(estado);
+      if (errores.length) return texto(`No guardé nada. Corrige y vuelve a intentar:\n- ${errores.join("\n- ")}`, true);
+      try {
+        await guardarPortafolio(usuario, estado);
+        return texto(JSON.stringify({ ok: true,
+          mensaje: "Tu portafolio quedó guardado en tu cuenta. En un chat nuevo pide 'cargar mi último portafolio' para retomarlo." }, null, 2));
+      } catch (e: any) {
+        return texto(`No pude guardar tu portafolio: ${e?.message || e}`, true);
+      }
+    }
+
+    case "cargar_mi_ultimo_portafolio": {
+      if (!usuario) return texto("Necesitas iniciar sesión para cargar tu portafolio.", true);
+      try {
+        const fila = await cargarPortafolio(usuario);
+        if (!fila) return texto("Todavía no tienes ningún portafolio guardado en tu cuenta.");
+        return await resultadoDashboard(fila.estado as Estado, origen, {
+          actualizado: fila.updated_at,
+          nota: "Este es tu último portafolio guardado. Ya se muestra en el dashboard.",
+        });
+      } catch (e: any) {
+        return texto(`No pude cargar tu portafolio: ${e?.message || e}`, true);
+      }
     }
 
     case "obtener_instrucciones":

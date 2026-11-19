@@ -8,12 +8,16 @@
 import { createRemoteJWKSet, jwtVerify } from "jose";
 
 // Proyecto Supabase. Ver odd/tasks/session-persistence-oauth.md.
-export const EMISOR = "https://pecwcmjqeouiijzkmbpg.supabase.co/auth/v1";
+export const SUPABASE_URL = "https://pecwcmjqeouiijzkmbpg.supabase.co";
+// Publishable key (pública por diseño). Se usa como `apikey` en las llamadas REST.
+export const SUPABASE_ANON_KEY = "sb_publishable_UN2GOMRxvmxznyahxFxZQA_NRv_SjtD";
+export const EMISOR = `${SUPABASE_URL}/auth/v1`;
 const JWKS = createRemoteJWKSet(new URL(`${EMISOR}/.well-known/jwks.json`));
 
 export interface Usuario {
   sub: string;
   email?: string;
+  token: string; // JWT crudo: se reenvía a la API REST de Supabase para que aplique RLS.
 }
 
 // Metadatos del recurso protegido (RFC 9728). Apuntan al Authorization Server.
@@ -68,6 +72,7 @@ export async function usuarioDeLaPeticion(req: Request): Promise<Usuario | null>
     return {
       sub: String(payload.sub),
       email: typeof payload.email === "string" ? payload.email : undefined,
+      token: m[1],
     };
   } catch {
     return null;
