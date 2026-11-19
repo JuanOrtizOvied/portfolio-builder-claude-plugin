@@ -67,19 +67,33 @@ gives for free, social-provider setup beyond email/password for the spike.
       `/.well-known/oauth-protected-resource`; add a 401 + `WWW-Authenticate` helper. (index.ts, new auth.ts)
       VERIFIED LIVE 2026-11-18 on `https://sabbi-portafolio.sabbi-tecnologia.workers.dev/.well-known/oauth-protected-resource/mcp`
       → returns `{resource, authorization_servers:[supabase], bearer_methods_supported}`. `jose` bundles fine on Workers.
-- [ ] T2 — Validate incoming Bearer JWT against Supabase JWKS (ES256); check iss/exp; extract `sub`. (auth.ts)
-- [ ] T3 — Add spike protected tool `whoami`: anonymous call → HTTP 401 challenge; valid token → returns `sub`. (mcp.ts)
-- [ ] T4 — Serve a minimal consent + login page at `/oauth/consent` from the Worker (browser,
-      `@supabase/supabase-js`: sign-in, `getAuthorizationDetails`/`approve`/`deny`). (public/)
-- [ ] T5 — User updates Supabase Site URL → Worker origin; manual E2E in Claude: add connector
+- [x] T2 — Validate incoming Bearer JWT against Supabase JWKS (ES256); check iss/exp; extract `sub`. (auth.ts)
+      VERIFIED via T5: `whoami` returned real sub + email.
+- [x] T3 — Add spike protected tool `whoami`: anonymous call → HTTP 401 challenge; valid token → returns `sub`. (mcp.ts)
+      VERIFIED via T5.
+- [x] T4 — Serve a minimal consent + login page at `/oauth/consent` from the Worker (browser,
+      `@supabase/supabase-js`: sign-in, `getAuthorizationDetails`/`approve`/`deny`). (public/oauth/consent.html)
+      Committed `2fd8485`. VERIFIED served + full flow via T5. supabase-js pinned only to @2 (spike).
+- [x] T5 — User updates Supabase Site URL → Worker origin; manual E2E in Claude: add connector
       with "sign in when needed", call `whoami`, confirm login + `user_id` reaches the Worker.
+      PASSED 2026-11-18. Connector auth "Sign in when needed" + OAuth client "Register automatically" (DCR,
+      NOT Claude's CIMD). `whoami` returned sub=466df317-16ad-423a-9ae6-354be0244555, email juan@sabbi.com.
+
+**SPIKE COMPLETE — all unknowns resolved. OAuth end-to-end works. Proceeding to feature phase.**
 
 ### Feature (only if spike passes)
 - [ ] T6 — Supabase table `portfolios` (user_id PK, state jsonb, updated_at) + RLS per user.
 - [ ] T7 — `guardar_mi_portafolio` protected tool: upsert the user's state.
 - [ ] T8 — `cargar_mi_ultimo_portafolio` protected tool: read the user's last state.
 - [ ] T9 — Wire into instrucciones + dashboard; update privacy footer and tool descriptions.
-- [ ] T10 — Polish consent/login UI with Sabbi brand.
+- [ ] T10 — Polish consent/login UI (Sabbi brand; fix card centering). Remove the self-registration
+      ("Crear una") toggle — users are provisioned manually, not self-signup.
+
+### User-provisioning decision (2026-11-18)
+Users are created manually by the admin (Dashboard → Authentication > Users → Add user, or Admin API),
+and self-signup is disabled (Authentication > Sign In / Providers → Email → turn off "Allow new users
+to sign up"). No user table is hand-built; Supabase `auth.users` is built-in. Consent page keeps login
+only (no sign-up).
 
 ## Acceptance criteria
 - Public tools still callable without auth.
